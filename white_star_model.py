@@ -65,26 +65,32 @@ max_min_lidar = max_min(lidar)
 print('max lidar:',max_min_lidar[0], 'min lidar:',max_min_lidar[1])
 
 
-# classify the terrain of each sq m area in the grid area.
+# classify the terrain of each sq m area in the grid area. And create grid of 
+# original data showing position of ice by its reference position in the ice 
+# list. This is to be used to efficiently find neighbours.
 ice = []
 sea = []
-for i in range (cols_radar):
-    for j in range (rows_radar):
+ice_ref = []
+ref = 0
+for i in range (rows_radar):
+    ice_ref_row = []
+    for j in range (cols_radar):
         if radar[i][j] >= 100:
             ice.append(terrain.Ice(i, j, radar, lidar))
+            ice_ref_row.append(ref)
+            ref += 1
         else:
             sea.append(terrain.Sea(i, j, radar, lidar))
+            ice_ref_row.append(-1)
+    ice_ref.append(ice_ref_row)
 print('number of cells containing ice:', len(ice))
 print('number of cells not containing ice:', len(sea))
+print(len(ice_ref))
 
 
+
 '''
-fig = matplotlib.pyplot.figure(figsize=(9, 9))
-plot = matplotlib.pyplot.imshow(radar)
-matplotlib.pyplot.show()
-'''
-'''
-fig = matplotlib.pyplot.figure(figsize=(9, 9))
+#fig = matplotlib.pyplot.figure(figsize=(9, 9))
 ax = fig.add_axes([0.05, 0.475, 0.9, 0.15])
 # create discrete colourmap
 cmap = matplotlib.colors.ListedColormap(['blue', 'green', 'red'])
@@ -110,28 +116,25 @@ print(numpy.unique(lidar_chm_im_class))
 '''
 
 
-# search cells around each ice cell and append to it's list of neighbours any ice celLs to the N, E, W, S.
-for i in range(len(ice)):
-    ice[i].neighbours = []
-    for j in range (len(ice)):
-        # cell to the west
-        if (ice[j].x == (ice[i].x - 1)) & (ice[j].y == ice[i].y):  
-            ice[i].neighbours.append(ice[j])
-        # cell to the north
-        elif (ice[j].x == ice[i].x) & (ice[j].y == (ice[i].y - 1)):  
-            ice[i].neighbours.append(ice[j])
-        # cell to the east
-        elif (ice[j].x == ice[i].x + 1) & (ice[j].y == (ice[i].y)):  
-            ice[i].neighbours.append(ice[j])
-        # cell to the north
-        elif (ice[j].x == ice[i].x) & (ice[j].y == (ice[i].y + 1)):  
-            ice[i].neighbours.append(ice[j])   
-            #id += 1
+# Append ice cell neighbours to the list of ice cells neighbours.
+for i in range (len(ice)):
+    # cell to the west
+    if radar[ice[i].x - 1][ice[i].y] >= 100:
+        ice[i].neighbours.append(ice[ice_ref[ice[i].x - 1][ice[i].y]]) 
+    # cell to the north
+    if radar[ice[i].x][ice[i].y - 1] >= 100:
+        ice[i].neighbours.append(ice[ice_ref[ice[i].x][ice[i].y - 1]])
+    # cell to the east
+    if radar[ice[i].x + 1][ice[i].y] >= 100:
+        ice[i].neighbours.append(ice[ice_ref[ice[i].x + 1][ice[i].y]])
+    # cell to the south
+    if radar[ice[i].x][ice[i].y + 1] >= 100:
+        ice[i].neighbours.append(ice[ice_ref[ice[i].x][ice[i].y + 1]])
 
-#this should loop through all ice not in checked list and keep adding the neighbours to 
-#check to the to_check list and keep working through the ice in the to 
-#check list until it is empty.    
 
+# this should loop through all ice not in checked list and keep adding the  
+# neighbours to check to the to_check list and keep working through the ice  
+# in the to check list until it is empty.    
 id = 0
 num_of_icebergs = 0
 checked = []
@@ -154,6 +157,7 @@ for i in range(len(ice)):
                     to_check.append(to_check[0].neighbours[j])
             checked.append(to_check[0])
             to_check.remove(to_check[0])
+            
 
 num_of_icebergs = id
 print('number of icebergs:',num_of_icebergs)
@@ -171,12 +175,51 @@ for i in range(num_of_icebergs):
         if ice[j].id == i + 1:
             berg_mass += ice[j].mass_tot
     iceberg_mass.append(berg_mass)
-print(iceberg_mass)
+#print(iceberg_mass)
 
+# Print the results of which icebergs can be tugged and which cannot.
+can_tug = []
 for i in range(num_of_icebergs):
     if iceberg_mass[i] < 36000000:
-        print('Iceberg ' + str(i + 1) + ' can be tugged')
+        print('Iceberg {0} can be tugged (mass = {1}kg)'.format(str(i + 1),int(iceberg_mass[i])))
+        can_tug.append(i + 1)
     else:
-        print('Iceberg ' + str(i + 1) + ' cannot be tugged')
+        print('Iceberg {0} cannot be tugged (mass = {1}kg)'.format(str(i + 1),int(iceberg_mass[i])))        
+        
+       
+# alter the property of each ice cell depending on whether it is part of an 
+# iceberg that can be tugged or not
+for i in range(len(ice)):
+    if ice[i].id in can_tug:
+        ice[i].tug = True         
+
+# create a rastor layer that can plot icebergs and differentiate between those
+# that can be tugged and those that can't
+tug_mask = []
+for i in range(rows_radar):
+    tug_mask_row = []
+    for j in range(cols_radar):
+        if radar[i][j] < 100:
+            tug_mask_row.append(0)
+        elif ice[ice_ref[i][j]].tug == False:         
+            tug_mask_row.append(2)
+        elif ice[ice_ref[i][j]].tug == True:
+            tug_mask_row.append(1)  
+    tug_mask.append(tug_mask_row)
+
+#print(tug_mask)
+fig = matplotlib.pyplot.figure()
+cmap_iceberg = matplotlib.colors.ListedColormap(['blue','green','red'])
+plot = matplotlib.pyplot.imshow(tug_mask,cmap = cmap_iceberg) 
+
+# Create custom legend to label the four canopy height classes:
+import matplotlib.patches as mpatches
+class_sea = mpatches.Patch(color='blue', label='Sea')
+class_tuggable_iceberg =_box = mpatches.Patch(color='green', label='tuggable_iceberg')
+class_non_tuggable_iceberg = mpatches.Patch(color='red', label='non_tuggable_iceberg')
+
+ax=matplotlib.pyplot.gca(); ax.ticklabel_format(useOffset=False, style='plain')
+ax.legend(handles=[class_sea,class_tuggable_iceberg,class_non_tuggable_iceberg],
+          handlelength=0.7,bbox_to_anchor=(1.05, 0.4),loc='lower left',borderaxespad=0.)
 
 print('\nmodel complete')

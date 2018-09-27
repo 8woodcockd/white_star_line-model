@@ -16,8 +16,8 @@ class Ice:
         self.height = lidar[i][j] * 0.1         #1 lidar unit = 0.1m height
         self.mass_asl = self.height * 1 * 900   # height * area * mass per m^3 
         self.mass_tot = self.mass_asl * 10    # approx. 90% of iceberg below sl
-        self.neighbours = 0
-
+        self.neighbours = []
+        self.tug = False
 
 class Sea:
     
@@ -26,3 +26,6 @@ class Sea:
         self.y = j
         self.radar = self
         self.lidar = lidar[i][j]
+        
+
+    
