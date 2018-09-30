@@ -8,8 +8,8 @@ Created on Sat Sep 22 20:23:01 2018
 class Ice:
     
     def __init__(self, i, j, radar, lidar):
-        self.x = i
-        self.y = j
+        self.x = j
+        self.y = i
         self.radar = radar[i][j]
         self.lidar = lidar[i][j]
         self.id = 0                          # iceburg ID number

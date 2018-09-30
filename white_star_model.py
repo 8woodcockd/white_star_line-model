@@ -89,33 +89,9 @@ print(len(ice_ref))
 
 
 
-'''
-#fig = matplotlib.pyplot.figure(figsize=(9, 9))
-ax = fig.add_axes([0.05, 0.475, 0.9, 0.15])
-# create discrete colourmap
-cmap = matplotlib.colors.ListedColormap(['blue', 'green', 'red'])
-bounds = [-0.5,0.5,1.5,2.5]
-tick = ['','sea','iceburg towable','iceburg not towable']
-norm = matplotlib.colors.BoundaryNorm(bounds,cmap.N)
-cbar = matplotlib.colorbar.ColorbarBase(ax, cmap=cmap,
-                                norm=norm,
-                                ticks=bounds,  # optional
-                                spacing='proportional',
-                                orientation='horizontal')
-matplotlib.colorbar.set_label('iceburg plot')
-'''
-'''
-# Define bins that you want, and then classify the data           source:  https://www.earthdatascience.org/courses/earth-analytics-python/lidar-raster-data/classify-plot-raster-data-in-python/
-class_bins = [0, 36000000, math.inf]
-
-# You'll classify the original image array, then unravel it again for plotting
-mass_class = numpy.digitize(mass, class_bins)
-
-# Note that you have an extra class in the data (0)
-print(numpy.unique(lidar_chm_im_class))
-'''
 
 
+'''
 # Append ice cell neighbours to the list of ice cells neighbours.
 for i in range (len(ice)):
     # cell to the west
@@ -130,7 +106,21 @@ for i in range (len(ice)):
     # cell to the south
     if radar[ice[i].x][ice[i].y + 1] >= 100:
         ice[i].neighbours.append(ice[ice_ref[ice[i].x][ice[i].y + 1]])
-
+'''
+# Append ice cell neighbours to the list of ice cells neighbours.
+for i in range (len(ice)):
+    # cell to the north
+    if radar[ice[i].y - 1][ice[i].x] >= 100:
+        ice[i].neighbours.append(ice[ice_ref[ice[i].y - 1][ice[i].x]]) 
+    # cell to the west
+    if radar[ice[i].y][ice[i].x - 1] >= 100:
+        ice[i].neighbours.append(ice[ice_ref[ice[i].y][ice[i].x - 1]])
+    # cell to the south
+    if radar[ice[i].y + 1][ice[i].x] >= 100:
+        ice[i].neighbours.append(ice[ice_ref[ice[i].y + 1][ice[i].x]])
+    # cell to the east
+    if radar[ice[i].y][ice[i].x + 1] >= 100:
+        ice[i].neighbours.append(ice[ice_ref[ice[i].y][ice[i].x + 1]])
 
 # this should loop through all ice not in checked list and keep adding the  
 # neighbours to check to the to_check list and keep working through the ice  
@@ -208,18 +198,41 @@ for i in range(rows_radar):
     tug_mask.append(tug_mask_row)
 
 #print(tug_mask)
-fig = matplotlib.pyplot.figure()
+fig = matplotlib.pyplot.figure(figsize=(9, 9))
+fig.suptitle('Iceberg Model')
 cmap_iceberg = matplotlib.colors.ListedColormap(['blue','green','red'])
 plot = matplotlib.pyplot.imshow(tug_mask,cmap = cmap_iceberg) 
 
 # Create custom legend to label the four canopy height classes:
 import matplotlib.patches as mpatches
 class_sea = mpatches.Patch(color='blue', label='Sea')
-class_tuggable_iceberg =_box = mpatches.Patch(color='green', label='tuggable_iceberg')
-class_non_tuggable_iceberg = mpatches.Patch(color='red', label='non_tuggable_iceberg')
+class_tuggable_iceberg =_box = mpatches.Patch(color='green', label='Tuggable iceberg')
+class_non_tuggable_iceberg = mpatches.Patch(color='red', label='Non-tuggable iceberg')
 
-ax=matplotlib.pyplot.gca(); ax.ticklabel_format(useOffset=False, style='plain')
+
+#ax = matplotlib.pyplot.gca(); ax.ticklabel_format(useOffset=False, style='plain')
+ax = matplotlib.pyplot; ax.ticklabel_format(useOffset=False, style='plain')
 ax.legend(handles=[class_sea,class_tuggable_iceberg,class_non_tuggable_iceberg],
           handlelength=0.7,bbox_to_anchor=(1.05, 0.4),loc='lower left',borderaxespad=0.)
 
+ax.tick_params(labelbottom=False,labeltop=True,top = True, right = True)
+matplotlib.pyplot.ylabel('Distance (m)')
+# ustomised x-label definition and position
+ax.text((cols_radar / 2),-20,'Distance (m)',fontsize=10,
+        horizontalalignment='center',verticalalignment='center')
+#find first coordinate of each iceberg fto place labels
+label_coords = []
+for i in range(num_of_icebergs):
+    for j in range(len(ice)):
+        if ice[j].id == i+1:
+            label_coords.append([ice[j].x, ice[j].y])
+
+            props = dict(boxstyle='round', facecolor='ghostwhite', alpha=1)
+            ax.text(
+                    ice[j].x, ice[j].y, 'Iceberg ' + str(i + 1), fontsize=10,
+                    horizontalalignment='right',verticalalignment='bottom',  
+                    bbox = props, alpha=0.5, wrap = True
+                    )
+            break
+print(label_coords)
 print('\nmodel complete')
