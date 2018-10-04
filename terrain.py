@@ -7,15 +7,19 @@ Created on Sat Sep 22 20:23:01 2018
 
 class Ice:
     
-    def __init__(self, i, j, radar, lidar):
+    def __init__(self, i, j, radar, lidar, lidar_unit_height, pixel_area, 
+                 ice_mass_density, fraction_ice_asl):
         self.x = j
         self.y = i
         self.radar = radar[i][j]
         self.lidar = lidar[i][j]
-        self.id = 0                          # iceburg ID number
-        self.height = lidar[i][j] * 0.1         #1 lidar unit = 0.1m height
-        self.mass_asl = self.height * 1 * 900   # height * area * mass per m^3 
-        self.mass_tot = self.mass_asl * 10    # approx. 90% of iceberg below sl
+        self.id = 0                          
+        self.height = lidar[i][j] * lidar_unit_height         
+        self.volume_asl = self.height * pixel_area
+        self.volume_tot = self.volume_asl * (1 / fraction_ice_asl)
+        self.mass_asl = self.volume_asl * ice_mass_density 
+        self.mass_tot = self.mass_asl * (1 / fraction_ice_asl)   
+
         self.neighbours = []
         self.tug = False
 
