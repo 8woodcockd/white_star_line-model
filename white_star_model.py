@@ -8,6 +8,7 @@ import csv
 import terrain
 import matplotlib.pyplot
 import matplotlib.colors
+from mpl_toolkits.axes_grid1 import make_axes_locatable
 
 #filename1 = 'white2_radar.csv'
 #filename2 = 'white2_lidar.csv'
@@ -23,7 +24,42 @@ radar_texture_filter = 100  # only values greater than or equal to this will be
 
 #the main model function is called when the run button in the GUI is pressed.
 def running_model(filename1,filename2):
-
+    
+    def plot_input(radar,lidar,cols_radar):
+        # Two subplots to display input radar and lidar data
+        fig, (ax1, ax2) = matplotlib.pyplot.subplots(1, 2)
+        fig.suptitle('Input Radar and Lidar Data')
+        #ax1.plot(x, y)
+        
+        c1 = ax1.imshow(radar, cmap=matplotlib.pyplot.cm.get_cmap('Blues'))
+        ax1.set_title('Radar:', x = 0, y = 1.08, ha='left')
+        ax1.set_ylabel('Distance (m)')
+        ax1.tick_params(labelbottom=False,labeltop=True,top = True, right = True)
+        # customised x-label definition and position
+        ax1.text((cols_radar / 2),-20,'Distance (m)',fontsize=10,
+                horizontalalignment='center',verticalalignment='center')
+        
+        c2 = ax2.imshow(lidar, cmap=matplotlib.pyplot.cm.get_cmap('Reds'))
+        ax2.set_title('Lidar:', x = 0, y = 1.08, ha='left')
+        ax2.set_ylabel('Distance (m)')
+        ax2.tick_params(labelbottom=False,labeltop=True,top = True, right = True)
+        # customised y-label definition and position
+        ax2.text((cols_radar / 2),-20,'Distance (m)',fontsize=10,
+                horizontalalignment='center',verticalalignment='center')
+        
+        divider = make_axes_locatable(ax1)
+        cax = divider.append_axes('bottom', size='5%', pad=0.1)
+        cbar1 = fig.colorbar(c1,orientation="horizontal", cax = cax)
+        #fig.colorbar(c1, orientation="horizontal", pad=0.2)
+        cbar1.set_label('Value (0-255)', rotation=0, labelpad=10)
+        
+        divider = make_axes_locatable(ax2)
+        cax = divider.append_axes('bottom', size='5%', pad=0.1)
+        cbar2 = fig.colorbar(c2,orientation="horizontal", cax = cax)
+        #fig.colorbar(c2, orientation="horizontal", pad=0.2)
+        cbar2.set_label('Value (0-255)', rotation=0, labelpad=10)
+    
+    
     # load the radar data.
     radar = []
     #with open('white2_radar.txt', newline ='') as f:
@@ -50,6 +86,9 @@ def running_model(filename1,filename2):
             for value in row:
                 rowlist.append(value)
             lidar.append(rowlist)
+    
+    # Show plots of input radar and lidar data
+    plot_input(radar,lidar,cols_radar)
     
     # classify the terrain of each square meter area in the grid area and 
     # create grid of original data showing position of ice by its reference 
@@ -186,8 +225,8 @@ def running_model(filename1,filename2):
         tug_mask.append(tug_mask_row)
     
     # Generate a afigure showing iceberg positions in area of interest
-    fig = matplotlib.pyplot.figure(figsize=(9, 9))
-    fig.suptitle('White Star Line Iceberg Model')
+    fig2 = matplotlib.pyplot.figure(figsize=(9, 9))
+    fig2.suptitle('White Star Line Iceberg Model')
     cmap_iceberg = matplotlib.colors.ListedColormap(['blue','green','red'])
     matplotlib.pyplot.imshow(tug_mask,cmap = cmap_iceberg)
     
@@ -230,3 +269,4 @@ def running_model(filename1,filename2):
     print('\nmodel complete')
 
 #running_model(filename1,filename2)
+    

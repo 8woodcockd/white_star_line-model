@@ -1,4 +1,4 @@
-#from tkinter import *
+from tkinter import *
 import tkinter.font as tkFont
 from tkinter.filedialog import askopenfilename
 import csv
