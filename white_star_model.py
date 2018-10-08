@@ -23,16 +23,17 @@ radar_texture_filter = 100  # only values greater than or equal to this will be
                             # considered to indicate the presence of ice
 
 #the main model function is called when the run button in the GUI is pressed.
-def running_model(filename1,filename2):
+def running_model(filename1,filename2,plot_inputs):
     
     def plot_input(radar,lidar,cols_radar):
         # Two subplots to display input radar and lidar data
-        fig, (ax1, ax2) = matplotlib.pyplot.subplots(1, 2)
+        #fig = matplotlib.pyplot.figure(figsize=(9, 9))
+        fig, (ax1, ax2) = matplotlib.pyplot.subplots(1, 2, figsize=(15, 15))
         fig.suptitle('Input Radar and Lidar Data')
         #ax1.plot(x, y)
         
         c1 = ax1.imshow(radar, cmap=matplotlib.pyplot.cm.get_cmap('Blues'))
-        ax1.set_title('Radar:', x = 0, y = 1.08, ha='left')
+        ax1.set_title('Radar:', x = 0, y = 1.05, ha='left')
         ax1.set_ylabel('Distance (m)')
         ax1.tick_params(labelbottom=False,labeltop=True,top = True, right = True)
         # customised x-label definition and position
@@ -40,7 +41,7 @@ def running_model(filename1,filename2):
                 horizontalalignment='center',verticalalignment='center')
         
         c2 = ax2.imshow(lidar, cmap=matplotlib.pyplot.cm.get_cmap('Reds'))
-        ax2.set_title('Lidar:', x = 0, y = 1.08, ha='left')
+        ax2.set_title('Lidar:', x = 0, y = 1.05, ha='left')
         ax2.set_ylabel('Distance (m)')
         ax2.tick_params(labelbottom=False,labeltop=True,top = True, right = True)
         # customised y-label definition and position
@@ -88,7 +89,8 @@ def running_model(filename1,filename2):
             lidar.append(rowlist)
     
     # Show plots of input radar and lidar data
-    plot_input(radar,lidar,cols_radar)
+    if plot_inputs == True:
+        plot_input(radar,lidar,cols_radar)
     
     # classify the terrain of each square meter area in the grid area and 
     # create grid of original data showing position of ice by its reference 

@@ -38,6 +38,10 @@ class App:
         Browse2 = Button(frameN,text="Browse...",font=fontReg, command=lambda : self.get_dir(Path2))
         Browse2.grid(row=2,column=2,sticky="W")
         
+        show_input = IntVar()
+        xb_plot_inputs = Checkbutton(frameN,text="Plot input data",font=fontReg, variable = show_input)
+        xb_plot_inputs.grid(row=3,column=1,sticky="W")
+        
         Label(frameN, text="Radar data file must be a comma separated .txt or .csv file ",font=fontReg).grid(row = 1,column = 3,sticky="W")
         Label(frameN, text="Lidar data file must be a comma separated .txt or .csv file ",font=fontReg).grid(row = 2, column = 3,sticky="W")
         
@@ -55,11 +59,20 @@ class App:
             P2 = Path2.get()
             filename1 = P1.rsplit("/",1)[1]
             filename2 = P2.rsplit("/",1)[1]
+            plot_inputs = show_input.get()
+            
             if (filename1 != '') & (filename2 != ''):
-                white_star_model.running_model(filename1,filename2)
+                white_star_model.running_model(filename1,filename2,plot_inputs)
+           
+            if xb_plot_inputs == False:
+                print('False xb_plot_inputs', show_input.get())
+            else:
+                print('True xb_plot_inputs', show_input.get())
             
         btnRun = Button(frameN,text="Run",width=10,font=fontReg,command=run)
         btnRun.grid(row=4,column=3,sticky="E")
+        
+        print('xb_plot_inputs', xb_plot_inputs)
         
     
         btnCancel = Button(frameN,text="Cancel",width=10,font=fontReg,command=cancel)
@@ -77,10 +90,9 @@ class App:
 
      
 root = Tk()
+root.title('White Star Line Model')
 root.resizable(0,0)
-
 app = App(root)
-
 root.mainloop()
 
 
