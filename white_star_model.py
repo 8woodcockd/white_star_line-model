@@ -9,77 +9,84 @@ import terrain
 import matplotlib.pyplot
 import matplotlib.colors
 from mpl_toolkits.axes_grid1 import make_axes_locatable
-
-#filename1 = 'white2_radar.csv'
-#filename2 = 'white2_lidar.csv'
+import matplotlib.patches
 
 tuggable_mass = 36000000
-fraction_ice_asl = 0.1 #fraction of ice column above surface
+fraction_ice_asl = 0.1 # Fraction of ice column above surface.
 resolution = 1
 pixel_area = resolution**2
-ice_mass_density = 900 # 900kg per cubic meter
-lidar_unit_height = 0.1     # 1 unit in the lidar data represents 0.1m height
-radar_texture_filter = 100  # only values greater than or equal to this will be 
-                            # considered to indicate the presence of ice
+ice_mass_density = 900 # 900kg per cubic meter.
+lidar_unit_height = 0.1    # One unit in the lidar data represents 0.1m height.
+radar_texture_filter = 100  # Values >= to this are interpreted as ice.
 
-#the main model function is called when the run button in the GUI is pressed.
-def running_model(filename1,filename2,plot_inputs):
+
+def plot_input(radar, lidar, cols_radar):
+    """This function will produce an output map showing the positions of 
+    icebergs with an assigned identifcation number, and their attributes 
+    (mass and volume).
+    """
+    # Generate two subplots to display input radar and lidar data.
+    fig, (ax1, ax2) = matplotlib.pyplot.subplots(1, 2, figsize=(15, 15))
+    fig.suptitle('Input Radar and Lidar Data')
     
-    def plot_input(radar,lidar,cols_radar):
-        # Two subplots to display input radar and lidar data
-        #fig = matplotlib.pyplot.figure(figsize=(9, 9))
-        fig, (ax1, ax2) = matplotlib.pyplot.subplots(1, 2, figsize=(15, 15))
-        fig.suptitle('Input Radar and Lidar Data')
-        #ax1.plot(x, y)
-        
-        c1 = ax1.imshow(radar, cmap=matplotlib.pyplot.cm.get_cmap('Blues'))
-        ax1.set_title('Radar:', x = 0, y = 1.05, ha='left')
-        ax1.set_ylabel('Distance (m)')
-        ax1.tick_params(labelbottom=False,labeltop=True,top = True, right = True)
-        # customised x-label definition and position
-        ax1.text((cols_radar / 2),-20,'Distance (m)',fontsize=10,
-                horizontalalignment='center',verticalalignment='center')
-        
-        c2 = ax2.imshow(lidar, cmap=matplotlib.pyplot.cm.get_cmap('Reds'))
-        ax2.set_title('Lidar:', x = 0, y = 1.05, ha='left')
-        ax2.set_ylabel('Distance (m)')
-        ax2.tick_params(labelbottom=False,labeltop=True,top = True, right = True)
-        # customised y-label definition and position
-        ax2.text((cols_radar / 2),-20,'Distance (m)',fontsize=10,
-                horizontalalignment='center',verticalalignment='center')
-        
-        divider = make_axes_locatable(ax1)
-        cax = divider.append_axes('bottom', size='5%', pad=0.1)
-        cbar1 = fig.colorbar(c1,orientation="horizontal", cax = cax)
-        #fig.colorbar(c1, orientation="horizontal", pad=0.2)
-        cbar1.set_label('Value (0-255)', rotation=0, labelpad=10)
-        
-        divider = make_axes_locatable(ax2)
-        cax = divider.append_axes('bottom', size='5%', pad=0.1)
-        cbar2 = fig.colorbar(c2,orientation="horizontal", cax = cax)
-        #fig.colorbar(c2, orientation="horizontal", pad=0.2)
-        cbar2.set_label('Value (0-255)', rotation=0, labelpad=10)
+    # Create plot of input radar data.
+    c1 = ax1.imshow(radar, cmap=matplotlib.pyplot.cm.get_cmap('Blues'))
+    ax1.set_title('Radar:', x=0, y=1.05, ha='left')
+    ax1.set_ylabel('Distance (m)')
+    ax1.tick_params(labelbottom=False, labeltop=True, top = True, right=True)
+    # Customise x-label definition and position.
+    ax1.text((cols_radar / 2), -20, 'Distance (m)', fontsize=10,
+            horizontalalignment='center', verticalalignment='center')
     
+    # Create plot of input lidar data.
+    c2 = ax2.imshow(lidar, cmap=matplotlib.pyplot.cm.get_cmap('Reds'))
+    ax2.set_title('Lidar:', x=0, y=1.05, ha='left')
+    ax2.set_ylabel('Distance (m)')
+    ax2.tick_params(labelbottom=False, labeltop=True, top=True, right=True)
+    # customised y-label definition and position
+    ax2.text((cols_radar / 2), -20, 'Distance (m)', fontsize=10,
+            horizontalalignment='center', verticalalignment='center')
     
-    # load the radar data.
+    # Position colourbar 1 next to axes 1.
+    divider = make_axes_locatable(ax1)
+    cax = divider.append_axes('bottom', size='5%', pad=0.1)
+    cbar1 = fig.colorbar(c1, orientation="horizontal", cax=cax)
+    cbar1.set_label('Value (0-255)', rotation=0, labelpad=10)
+    
+    # Position colourbar 2 next to axes 2.
+    divider = make_axes_locatable(ax2)
+    cax = divider.append_axes('bottom', size='5%', pad=0.1)
+    cbar2 = fig.colorbar(c2, orientation="horizontal", cax = cax)
+    cbar2.set_label('Value (0-255)', rotation=0, labelpad=10)
+
+cols_radar = 0
+# The running_model function is called when the run button in the GUI is 
+# pressed or the cose at the bottom of the script can be uncommented in order 
+# to run this script directly and call this function.
+def running_model(filename1, filename2, plot_inputs):
+    """This function will process the input radar and lidar data and determine 
+    the position and attributes of each iceberg within the area of interest.
+    """
+    global ice
+    global cols_radar
+    # Load the radar data.
     radar = []
-    #with open('white2_radar.txt', newline ='') as f:
-    with open(filename1, newline ='') as f:
+    with open(filename1, newline='') as f:
         reader = csv.reader(f, quoting=csv.QUOTE_NONNUMERIC)
         for row in reader: 
             rowlist = []
             for value in row:
                 rowlist.append(value)
             radar.append(rowlist)
-    #calculate the number of x and y values and hence the grid area. The lidar 
-    #data area should be for exatly the same area and be at exactly the same 
-    #resoltion (1m)
+    # Calculate the number of x and y values and hence the grid area. The lidar 
+    # data area should be for exatly the same area and be at exactly the same 
+    # resoltion (1m).
     rows_radar = len(radar)
     cols_radar = len(radar[0])
     
-    # load the lidar data.
+    # Load the lidar data.
     lidar = []
-    with open(filename2, newline ='') as f:
+    with open(filename2, newline='') as f:
         reader = csv.reader(f, quoting=csv.QUOTE_NONNUMERIC)
         for row in reader: 
             #print(row)
@@ -88,14 +95,17 @@ def running_model(filename1,filename2,plot_inputs):
                 rowlist.append(value)
             lidar.append(rowlist)
     
-    # Show plots of input radar and lidar data
+    # Show plots of input radar and lidar data if user has chosen to plot this.
     if plot_inputs == True:
         plot_input(radar,lidar,cols_radar)
     
-    # classify the terrain of each square meter area in the grid area and 
-    # create grid of original data showing position of ice by its reference 
-    # position in the ice list. This is to be used to efficiently find 
-    # neighbours.
+    
+#def classification():
+    # Classify the terrain of each square meter area in the grid area as either 
+    # ice or sea. From this create grid showing ice reference numbers in the 
+    # position of each ice cell in the list of ice. This is then used to 
+    # efficiently identify and find neighbouring ice cells by their reference
+    # number.
     ice = []
     sea = []
     ice_ref = []
@@ -106,7 +116,7 @@ def running_model(filename1,filename2,plot_inputs):
             if radar[i][j] >= 100: 
                 ice.append(terrain.Ice(i, j, radar, lidar, lidar_unit_height, 
                                        pixel_area, ice_mass_density, 
-                                       fraction_ice_asl))
+                                       fraction_ice_asl, cols_radar))
                 ice_ref_row.append(ref)
                 ref += 1
             else:
@@ -116,8 +126,9 @@ def running_model(filename1,filename2,plot_inputs):
     print('number of cells (sq m) containing ice:', len(ice))
     print('number of cells (sq m) not containing ice:', len(sea))
     
-    # Identify and create a list of each ice cells neighbouring cells that are 
-    # also ice to enable the identification of icebergs (groups of ice cells)
+    # Identify and create a list of each ice cells neighbours that are also
+    # ice to enable the identification of icebergs (groups of ice cells).
+    # A list of each ice cells neighbours is appended to each ice cell.
     for i in range (len(ice)):
         # cell to the north
         if radar[ice[i].y - 1][ice[i].x] >= 100:
@@ -132,9 +143,11 @@ def running_model(filename1,filename2,plot_inputs):
         if radar[ice[i].y][ice[i].x + 1] >= 100:
             ice[i].neighbours.append(ice[ice_ref[ice[i].y][ice[i].x + 1]])
     
-    # this should loop through all ice not in checked list and keep adding the  
-    # neighbours to check to the to_check list and keep working through the ice  
-    # in the to check list until it is empty.    
+    # Loop through all ice not in the 'checked' list and keep adding the  
+    # neighbouring ice cells to the 'to_check' list as they are part of the 
+    # same iceberg. When the 'to_check list becomes empty a new loop begins 
+    # which will seek the next group of ice cells that make up an iceberg and 
+    # assign them all the same ID number.     
     id = 0
     num_of_icebergs = 0
     checked = []
@@ -148,22 +161,20 @@ def running_model(filename1,filename2,plot_inputs):
                 to_check.remove(ice[i])
             for j in range(len(ice[i].neighbours)):
                 to_check.append(ice[i].neighbours[j])
-            #print('are there two nested lists?', to_check)
             while len(to_check) > 0:
-                #print('len(to_check) > 0')
-                to_check[0].id = id       # key line
+                to_check[0].id = id
                 for j in range(len(to_check[0].neighbours)):
                     if (to_check[0].neighbours[j] not in checked) & (
-                        to_check[0].neighbours[j] not in to_check):
+                            to_check[0].neighbours[j] not in to_check):
                         to_check.append(to_check[0].neighbours[j])
                 checked.append(to_check[0])
                 to_check.remove(to_check[0])
     
-    # Record number of icebergs within the data area            
+    # Record the number of icebergs within the data area.            
     num_of_icebergs = id
-    print('number of icebergs:',num_of_icebergs)
+    print('number of icebergs:', num_of_icebergs)
     
-    # Calculate the total mass of ice in each iceberg
+    # Calculate the total mass of ice in each iceberg.
     iceberg_mass = []
     for i in range(num_of_icebergs):
         berg_mass = 0
@@ -172,7 +183,7 @@ def running_model(filename1,filename2,plot_inputs):
                 berg_mass += ice[j].mass_tot
         iceberg_mass.append(berg_mass)
         
-    # Calculate the total volume of ice in each iceberg
+    # Calculate the total volume of ice in each iceberg.
     iceberg_volume = []
     for i in range(num_of_icebergs):
         berg_volume = 0
@@ -189,11 +200,11 @@ def running_model(filename1,filename2,plot_inputs):
                 print('Iceberg {0} can be tugged (mass = {1}kg, '\
                       'volume = {2}m^3)'
                      .format(str(i + 1), int(iceberg_mass[i]), 
-                              int(iceberg_volume[i])))
+                             int(iceberg_volume[i])))
                 f.write('Iceberg {0} can be tugged (mass = {1}kg, '\
                         'volume = {2}m^3)\n'
                      .format(str(i + 1), int(iceberg_mass[i]), 
-                              int(iceberg_volume[i])))
+                             int(iceberg_volume[i])))
                 can_tug.append(i + 1)
             else:
                 print('Iceberg {0} cannot be tugged (mass = {1}kg, '\
@@ -205,14 +216,13 @@ def running_model(filename1,filename2,plot_inputs):
                       .format(str(i + 1), int(iceberg_mass[i]), 
                               int(iceberg_volume[i]))) 
             
-        
-    # alter the property of each ice cell depending on whether it is part of an 
-    # iceberg that can be tugged or not
+    # Alter the property of each ice cell depending on whether it is part of an 
+    # iceberg that can be tugged or not.
     for i in range(len(ice)):
         if ice[i].id in can_tug:
             ice[i].tug = True         
     
-    # create a rastor layer that can plot icebergs and differentiate between 
+    # Create a rastor layer that can plot icebergs and differentiate between 
     # those that can be tugged and those that cannot.
     tug_mask = []
     for i in range(rows_radar):
@@ -226,32 +236,32 @@ def running_model(filename1,filename2,plot_inputs):
                 tug_mask_row.append(1)  
         tug_mask.append(tug_mask_row)
     
-    # Generate a afigure showing iceberg positions in area of interest
+    # Generate a figure showing iceberg positions in the area of interest.
     fig2 = matplotlib.pyplot.figure(figsize=(9, 9))
     fig2.suptitle('White Star Line Iceberg Model')
-    cmap_iceberg = matplotlib.colors.ListedColormap(['blue','green','red'])
-    matplotlib.pyplot.imshow(tug_mask,cmap = cmap_iceberg)
+    cmap_iceberg = matplotlib.colors.ListedColormap(['blue', 'green', 'red'])
+    matplotlib.pyplot.imshow(tug_mask, cmap=cmap_iceberg)
     
-    # Create custom legend to label the four canopy height classes:
-    import matplotlib.patches as mpatches
-    class_sea = mpatches.Patch(color='blue', label='Sea')
-    class_tuggable_iceberg = mpatches.Patch(color='green', 
+    # Create a custom legend to label the  whether the iceberg can be tugged or
+    # not and which areas are not ice (assumed sea).
+    class_sea = matplotlib.patches.Patch(color='blue', label='Sea')
+    class_tuggable_iceberg = matplotlib.patches.Patch(color='green', 
                                             label='Tuggable iceberg')
-    class_non_tuggable_iceberg = mpatches.Patch(color='red', 
+    class_non_tuggable_iceberg = matplotlib.patches.Patch(color='red', 
                                                 label='Non-tuggable iceberg')
     ax = matplotlib.pyplot; ax.ticklabel_format(useOffset=False, style='plain')
-    ax.legend(handles=[class_sea,class_tuggable_iceberg,
+    ax.legend(handles=[class_sea, class_tuggable_iceberg,
                        class_non_tuggable_iceberg],
-              handlelength=0.7,bbox_to_anchor=(1.05, 0.4),loc='lower left',
+              handlelength=0.7, bbox_to_anchor=(1.05, 0.4), loc='lower left',
               borderaxespad=0.)
-    
-    ax.tick_params(labelbottom=False,labeltop=True,top = True, right = True)
+    ax.tick_params(labelbottom=False, labeltop=True, top = True, right = True)
     matplotlib.pyplot.ylabel('Distance (m)')
-    # ustomised x-label definition and position
-    ax.text((cols_radar / 2),-20,'Distance (m)',fontsize=10,
-            horizontalalignment='center',verticalalignment='center')
+    # Customised x-label definition and position.
+    ax.text((cols_radar / 2), -20, 'Distance (m)', fontsize=10,
+            horizontalalignment='center', verticalalignment='center')
     
-    #find first coordinate of each iceberg to position ID labels
+    # Find the first coordinate of each iceberg and insert ID labels at this
+    # position.
     label_coords = []
     for i in range(num_of_icebergs):
         for j in range(len(ice)):
@@ -261,14 +271,22 @@ def running_model(filename1,filename2,plot_inputs):
                 ax.text(
                         ice[j].x, ice[j].y, 'Iceberg {0}\n(mass = {1}kg)\n'\
                         '(volume = {2}m^3)'
-                        .format((i + 1),int(iceberg_mass[i]),int(iceberg_volume[i])), 
-                        fontsize=10,horizontalalignment='right',
-                        verticalalignment='bottom', bbox = props, alpha=0.5, 
-                        wrap = True
-                        )
+                        .format((i + 1), int(iceberg_mass[i]), 
+                                int(iceberg_volume[i])), fontsize=10,
+                                horizontalalignment='right', 
+                                verticalalignment='bottom', bbox = props, 
+                                alpha=0.5, 
+                                wrap = True)
                 break
     
     print('\nmodel complete')
 
-#running_model(filename1,filename2)
-    
+# Use the code below to run the model directly from this script 
+# (bypassing the GUI).
+#filename1 = 'white2_radar.csv'
+#filename2 = 'white2_lidar.csv'
+#plot_inputs = False
+#running_model(filename1, filename2, plot_inputs)
+
+
+
