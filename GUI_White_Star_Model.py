@@ -1,9 +1,8 @@
-from tkinter import *
-import tkinter.font as tkFont
-from tkinter.filedialog import askopenfilename
-import csv
+import tkinter as tk
 import white_star_model
-import sys
+from tkinter.filedialog import askopenfilename
+from tkinter.font import Font
+
 
 class App:
     """ Create a GUI for the user to select files and options to run the model.
@@ -13,63 +12,63 @@ class App:
         """ Customise GUI features and appearance.
         """
         # Create font types.
-        fontHead = tkFont.Font(family="Arial", size=10, weight=tkFont.BOLD)
-        fontBold = tkFont.Font(family="Arial", size=8, weight=tkFont.BOLD)
-        fontReg =  tkFont.Font(family="Arial", size=8)
+        fontBold = Font(family="Arial", size=8, weight=tk.font.BOLD)
+        fontReg =  Font(family="Arial", size=8)
         
         # Create a frame.
-        frame1 = Frame(master)
+        frame1 = tk.Frame(master)
         frame1.grid(row=0, padx=6, pady=5)
-        frame2 = Frame(frame1)
+        frame2 = tk.Frame(frame1)
         frame2.grid(row=0, columnspan=5, padx=5)
     
         # Create a line in the frame and the header in bold for the window.
-        Canvas(frame2, borderwidth=0, relief="flat", height=1, width=20,
+        tk.Canvas(frame2, borderwidth=0, relief="flat", height=1, width=20,
                background="#cccccc").grid(row=0)
-        Label(frame2, text="Load Radar and Lidar Data", font=fontBold,
+        tk.Label(frame2, text="Load Radar and Lidar Data", font=fontBold,
               width=22).grid(row=0, column=1)
-        Canvas(frame2, borderwidth=0, relief="flat", height=1, width=440,
+        tk.Canvas(frame2, borderwidth=0, relief="flat", height=1, width=440,
                background="#cccccc").grid(row=0, column=2, sticky="WE")
         
         # Create a label, entry window and browse files button.
-        Label(frame1, text="Radar data file:", font=fontReg).grid(row=1,
+        tk.Label(frame1, text="Radar data file:", font=fontReg).grid(row=1,
                                                                   sticky="W") 
-        Path1 = Entry(frame1, width=30, font=fontReg)
+        Path1 = tk.Entry(frame1, width=30, font=fontReg)
         Path1.grid(row=1, column=1, sticky="W")
-        Browse1 = Button(frame1, text="Browse...", font=fontReg, 
+        Browse1 = tk.Button(frame1, text="Browse...", font=fontReg, 
                          command=lambda : self.get_dir(Path1))
         Browse1.grid(row=1, column=2, sticky="W")
         
         # Create a second label, entry window and browse files button.
-        Label(frame1, text="Lidar data file:", font=fontReg).grid(row=2,
+        tk.Label(frame1, text="Lidar data file:", font=fontReg).grid(row=2,
                                                                   sticky="W")
-        Path2 = Entry(frame1, width=30, font=fontReg)
+        Path2 = tk.Entry(frame1, width=30, font=fontReg)
         Path2.grid(row=2, column=1, sticky="W")
-        Browse2 = Button(frame1, text="Browse...", font=fontReg, 
+        Browse2 = tk.Button(frame1, text="Browse...", font=fontReg, 
                          command=lambda : self.get_dir(Path2))
         Browse2.grid(row=2, column=2, sticky="W")
         
         # Create a checkbutton so the user can choose to plot the input data.
-        show_input = IntVar()
-        xb_plot_inputs = Checkbutton(frame1, text="Plot input data",
+        show_input = tk.IntVar()
+        xb_plot_inputs = tk.Checkbutton(frame1, text="Plot input data",
                                      font=fontReg, variable = show_input)
         xb_plot_inputs.grid(row=3, column=1, sticky="W")
         
         # Add labels that inform the user what file types are acceptable.
-        Label(frame1, text="Radar data file must be a comma separated txt "\
+        tk.Label(frame1, text="Radar data file must be a comma separated txt "\
               "or csv file ", font=fontReg).grid(row = 1, column = 3, 
                                                  sticky="W")
-        Label(frame1, text="Lidar data file must be a comma separated txt "\
+        tk.Label(frame1, text="Lidar data file must be a comma separated txt "\
               "or csv file ", font=fontReg).grid(row = 2, column = 3,
                                                  sticky="W")
         # Create a line along the bottom of the GUI. 
-        Canvas(frame1, borderwidth=1, relief="groove", width=350, 
+        tk.Canvas(frame1, borderwidth=1, relief="groove", width=350, 
                height=0).grid(row=3, columnspan=5, pady=10)
     
         def run():
             """ Command the White Star Model.py script to run using the input 
             files selected by the user.
             """
+            
             # Retrieve filename from user input.
             P1 = Path1.get()
             P2 = Path2.get()
@@ -85,35 +84,35 @@ class App:
             if (filename1 != '') & (filename2 != ''):
                 white_star_model.running_model(filename1, filename2, 
                                                plot_inputs)
-        
+                                               
         # Create a button to run the program.
-        btnRun = Button(frame1, text="Run", width=10, font=fontReg, 
+        btnRun = tk.Button(frame1, text="Run", width=10, font=fontReg, 
                         command=run)
         btnRun.grid(row=4, column=3, sticky="E")
         
         # Create a button to cancel the running of the program
-        btnClose = Button(frame1, text="Close", width=10, font=fontReg,
+        btnClose = tk.Button(frame1, text="Close", width=10, font=fontReg,
                            command=root.destroy)
         btnClose.grid(row=4, column=4, sticky="W")
     
-    # This is here to provide a docstring for the run function.
+    ## This is here to provide a docstring for the run function.
     def run():
         """ Command the White Star Model.py script to run using the input 
-            files selected by the user.
+            #files selected by the user. 222
         """
     
     def get_dir(self, box):
         """Allow user to browse for csv and text files and show file path
         in the entry window once selected.
         """
-        tmp = askopenfilename(initialdir='/home/', title="filetext", 
-                              filetypes=[('text files', '.txt'),
-                                         ('comma seperated value files', 
-                                          '.csv')])
-        box.delete(0, END) # Clear entry box when browse button is pushed.
+        tmp = askopenfilename(
+                initialdir='/home/', title="filetext", 
+                filetypes=[('text files', '.txt'), 
+                           ('comma seperated value files', '.csv')])
+        box.delete(0, tk.END) # Clear entry box when browse button is pushed.
         box.insert(0, tmp) # Insert text at beginning of entry box.
      
-root = Tk()
+root = tk.Tk()
 root.title('White Star Line Model')
 root.resizable(0,0)
 app = App(root)

@@ -6,6 +6,8 @@ Created on Sat Sep 22 20:23:01 2018
 """
 
 class Ice:
+    """Assign attributes to each identified ice cell (assumed sea).
+    """ 
     
     def __init__(self, i, j, radar, lidar, lidar_unit_height, pixel_area, 
                  ice_mass_density, fraction_ice_asl, cols_radar):
@@ -27,17 +29,15 @@ class Ice:
     
     @property
     def x(self):
-        """Specify the conditions to get_x.
+        """The x position (easting). Specify the conditions to get_x, set_x,
+        and del_x.
         """
         if self._x < self._cols_radar:
             return self._x
         else:
             print('The x value is outside of the acceptable range.')
-    
     @x.setter
     def x(self, value):
-        """Specify the conditions to set_x.
-        """
         if isinstance(value, int) == False: 
             print('x value must be integer')
             return
@@ -45,28 +45,22 @@ class Ice:
             self._x = value
         else:
             print('x value entered is outside of the acceptable range')        
-
     @x.deleter
-    
     def x(self):
-        """Specify the conditions to del_x.
-        """
         print('You cannot delete the ice.x attributes.')
         return
     
     @property
     def y(self):
-        """Specify the conditions to get_y.
+        """The y position (northing). Specify the conditions to get_y, 
+        the conditions to set_y and the conditions to del_y.
         """
         if self._y < self._cols_radar:
             return self._y
         else:
             print('The y value is outside of the acceptable range.')
-    
     @y.setter
     def y(self, value):
-        """Specify the conditions to set_y.
-        """
         if isinstance(value, int) == False: 
             print('y value must be integer')
             return
@@ -74,231 +68,185 @@ class Ice:
             self._y = value
         else:
             print('y value entered is outside of the acceptable range')        
-
     @y.deleter
     def y(self):
-        """Specify the conditions to del_y.
-        """
         print('You cannot delete the ice y attributes.')
         return
     
     @property
     def radar(self):
-        """Specify the conditions to get_radar.
+        """The radar value associated with the ice cell. Specify the conditions
+        to get_radar, set_radar, and del_radar.
         """
         return self._radar
-    
     @radar.setter
     def radar(self, value):
-        """Specify the conditions to set_radar.
-        """
         self._radar = value
-
     @radar.deleter
     def radar(self):
-        """Specify the conditions to del_radar.
-        """
         print('You cannot delete the radar attribute.')
         return
     
     @property
     def lidar(self):
-        """Specify the conditions to get_lidar.
+        """The lidar value associated with the ice cell. Specify the conditions
+        to get_lidar, set_lidar, and del_lidar.
         """
         return self._lidar
-   
     @lidar.setter
     def lidar(self, value):
-        """Specify the conditions to set_lidar.
-        """
         self._lidar = value
-
     @lidar.deleter
     def lidar(self):
-        """Specify the conditions to del_lidar.
-        """
         print('You cannot delete the lidar attribute.')
         return
     
     @property
     def id(self):
-        """Specify the conditions to get_id.
+        """The identification number given to each cell of ice to specify which 
+        iceberg it is associated with. Specify the conditions to get_id, the
+        conditions to set_id, and the conditions to del_id
         """
         return self._id
-   
     @id.setter
     def id(self, value):
-        """Specify the conditions to set_id.
-        """
         if self._id > 0:
             print('Cannot change iceberg ID.')
         else:
             self._id = value
-
     @id.deleter
     def id(self):
-        """Specify the conditions to del_id.
-        """
         print('You cannot delete the iceberg ID.')
         return
 
     @property
     def height(self):
-        """Specify the conditions to get_height.
+        """The height of the ice above sea level. Specify the conditions to
+        get_height, the conditions to set_height, and the conditions to 
+        del_height.
         """
         return self._height
-   
     @height.setter
     def height(self, value):
-        """Specify the conditions to set_height.
-        """
         self._height = value
-
     @height.deleter
     def height(self):
-        """Specify the conditions to del_height.
-        """
         print('You cannot delete the height attribute.')
         return
 
     @property
     def volume_asl(self):
-        """Specify the conditions to get_volume_asl.
+        """The volume of ice above sea level at the specified terrain position 
+        (raster cell). Specify the conditions to get_volume_asl,  the
+        conditions to set_volume_asl, and the conditions to del_volume_asl. 
         """
         return self._volume_asl
-   
     @volume_asl.setter
     def volume_asl(self, value):
-        """Specify the conditions to set_volume_asl.
-        """
         self._volume_asl = value
-
     @volume_asl.deleter
     def volume_asl(self):
-        """Specify the conditions to del_volume_asl.
-        """
         print('You cannot delete the volume_asl attribute.')
         return
     
     @property
     def volume_tot(self):
-        """Specify the conditions to get_volume_tot.
+        """The total volume of ice above and below sea level at the specified
+        terrain position (raster cell). Specify the conditions to 
+        get_volume_tot, the conditions to set_volume_tot, and the conditions to 
+        del_volume_tot.
         """
         return self._volume_tot
-   
     @volume_tot.setter
     def volume_tot(self, value):
-        """Specify the conditions to set_volume_tot.
-        """
         self._volume_tot = value
-
     @volume_tot.deleter
     def volume_tot(self):
-        """Specify the conditions to del_volume_tot.
-        """
         print('You cannot delete the volume_tot attribute.')
         return
     
     @property
     def mass_asl(self):
-        """Specify the conditions to get_mass_asl.
+        """The mass of ice above sea level at the specified terrain position 
+        (raster cell). Specify the conditions to get_mass_asl,  the
+        conditions to set_mass_asl, and the conditions to del_mass_asl. 
         """
         return self._mass_asl
-   
     @mass_asl.setter
     def mass_asl(self, value):
-        """Specify the conditions to set_mass_asl.
-        """
         self._mass_asl = value
-
     @mass_asl.deleter
     def mass_asl(self):
-        """Specify the conditions to del_mass_asl.
-        """
         print('You cannot delete the mass_asl attribute.')
         return
     
     @property
     def mass_tot(self):
-        """Specify the conditions to get_mass_tot.
+        """The total mass of ice above and below sea level at the specified
+        terrain position (raster cell). Specify the conditions to 
+        get_mass_tot, the conditions to set_mass_tot, and the conditions to 
+        del_mass_tot.
         """
         return self._mass_tot
-   
     @mass_tot.setter
     def mass_tot(self, value):
-        """Specify the conditions to set_mass_tot.
-        """
         self._mass_tot = value
-
     @mass_tot.deleter
     def mass_tot(self):
-        """Specify the conditions to del_mass_tot.
-        """
         print('You cannot delete the mass_tot attribute.')
         return
 
     @property
     def cols_radar(self):
-        """Specify the conditions to get_cols_radar.
+        """The number of columns in the raster grid of the radar data (the 
+        lidar data should have the same number of columns). Specify the 
+        conditions to get_cols_radar, set_cols_radar, and del_cols_radar.
         """
         return self._cols_radar
-    
     @cols_radar.setter
     def cols_radar(self, value):
-        """Specify the conditions to set_cols_radar.
-        """
         self._cols_radar = value
-
     @cols_radar.deleter
     def cols_radar(self):
-        """Specify the conditions to del_cols_radar.
-        """
         print('You cannot delete the cols_radar attribute.')
         return
     
     @property
     def neighbours(self):
-        """Specify the conditions to get_neighbours.
+        """A list of the adjacent ice cells in the raster grid. Specify the
+        conditions to get_neighbours, set_neighbours, and del_neighbours.
         """
         return self._neighbours
-   
     @neighbours.setter
     def neighbours(self, value):
-        """Specify the conditions to set_neighbours.
-        """
         print('Cannot change neighbours attribute.')
-
     @neighbours.deleter
     def neighbours(self):
-        """Specify the conditions to del_neighbours.
-        """
         print('You cannot delete the neighbours attribute.')
         return
     
     @property
     def tug(self):
-        """Specify the conditions to get_tug.
+        """A boolean property which identifies whether the ice cell is part of
+        an iceberg that can be tugged. Specify the conditions to get_tug, 
+        set_tug, and del_tug.
         """
         return self._tug
-   
     @tug.setter
     def tug(self, value):
-        """Specify the conditions to set_tug.
-        """
         if self._tug > 0:
             print('Cannot change the assigned tug attribute.')
         self._tug = value
-
     @tug.deleter
     def tug(self):
-        """Specify the conditions to del_tug.
-        """
         print('You cannot delete the tug attribute.')
         return
+    
     
 class Sea:
     """Assign attributes to each identified non-ice cell (assumed sea).
     """
+    
     def __init__(self, i, j, radar, lidar):
         """Assign attributes to each identified ice cell.
         """ 
@@ -309,17 +257,15 @@ class Sea:
         
     @property
     def x(self):
-        """Specify the conditions to get_x.
+        """The x position (easting). Specify the conditions to get_x, set_x,
+        and del_x.
         """
         if self._x < self._cols_radar:
             return self._x
         else:
             print('The x value is outside of the acceptable range.')
-   
     @x.setter
     def x(self, value):
-        """Specify the conditions to set_x.
-        """
         if isinstance(value, int) == False: 
             print('x value must be integer')
             return
@@ -327,27 +273,22 @@ class Sea:
             self._x = value
         else:
             print('x value entered is outside of the acceptable range') 
-
     @x.deleter
     def x(self):
-        """Specify the conditions to del_x.
-        """
         print('You cannot delete the x attribute.')
         return
     
     @property
     def y(self):
-        """Specify the conditions to get_y.
+        """The y position (northing). Specify the conditions to get_y, 
+        the conditions to set_y and the conditions to del_y.
         """
         if self._y < self._cols_radar:
             return self._y
         else:
             print('The y value is outside of the acceptable range.')
-   
     @y.setter
     def y(self, value):
-        """Specify the conditions to set_y.
-        """
         if isinstance(value, int) == False: 
             print('y value must be integer')
             return
@@ -355,49 +296,36 @@ class Sea:
             self._y = value
         else:
             print('y value entered is outside of the acceptable range')  
-
     @y.deleter
     def y(self):
-        """Specify the conditions to del_y.
-        """
         print('You cannot delete the y attribute.')
         return
     
     @property
     def radar(self):
-        """Specify the conditions to get_radar.
+        """The radar value associated with the sea cell. Specify the conditions
+        to get_radar, set_radar, and del_radar.
         """
         return self._radar
-    
     @radar.setter
     def radar(self, value):
-        """Specify the conditions to set_radar.
-        """
         self._radar = value
-
     @radar.deleter
     def radar(self):
-        """Specify the conditions to del_radar.
-        """
         print('You cannot delete the radar attribute.')
         return
     
     @property
     def lidar(self):
-        """Specify the conditions to get_lidar.
+        """The lidar value associated with the sea cell. Specify the conditions
+        to get_lidar, set_lidar, and del_lidar.
         """
         return self._lidar
-   
     @lidar.setter
     def lidar(self, value):
-        """Specify the conditions to set_lidar.
-        """
         self._lidar = value
-
     @lidar.deleter
     def lidar(self):
-        """Specify the conditions to del_lidar.
-        """
         print('You cannot delete the lidar attribute.')
         return
     
