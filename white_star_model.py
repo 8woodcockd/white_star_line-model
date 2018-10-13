@@ -59,7 +59,6 @@ def plot_input(radar, lidar, cols_radar):
     cbar2 = fig.colorbar(c2, orientation="horizontal", cax = cax)
     cbar2.set_label('Value (0-255)', rotation=0, labelpad=10)
 
-cols_radar = 0
 # The running_model function is called when the run button in the GUI is 
 # pressed or the cose at the bottom of the script can be uncommented in order 
 # to run this script directly and call this function.
@@ -68,7 +67,8 @@ def running_model(filename1, filename2, plot_inputs):
     the position and attributes of each iceberg within the area of interest.
     """
     global ice
-    global cols_radar
+    global sea
+    
     # Load the radar data.
     radar = []
     with open(filename1, newline='') as f:
@@ -97,10 +97,8 @@ def running_model(filename1, filename2, plot_inputs):
     
     # Show plots of input radar and lidar data if user has chosen to plot this.
     if plot_inputs == True:
-        plot_input(radar,lidar,cols_radar)
-    
-    
-#def classification():
+        plot_input(radar,lidar,cols_radar)    
+
     # Classify the terrain of each square meter area in the grid area as either 
     # ice or sea. From this create grid showing ice reference numbers in the 
     # position of each ice cell in the list of ice. This is then used to 
@@ -278,15 +276,12 @@ def running_model(filename1, filename2, plot_inputs):
                                 alpha=0.5, 
                                 wrap = True)
                 break
-    
-    print('\nmodel complete')
+
+    print('\nModel run complete.')
 
 # Use the code below to run the model directly from this script 
 # (bypassing the GUI).
-#filename1 = 'white2_radar.csv'
-#filename2 = 'white2_lidar.csv'
-#plot_inputs = False
-#running_model(filename1, filename2, plot_inputs)
-
-
-
+filename1 = 'white2_radar.csv'
+filename2 = 'white2_lidar.csv'
+plot_inputs = False
+running_model(filename1, filename2, plot_inputs)
