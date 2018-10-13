@@ -2,7 +2,7 @@ import tkinter as tk
 import white_star_model
 from tkinter.filedialog import askopenfilename
 from tkinter.font import Font
-
+import os
 
 class App:
     """ Create a GUI for the user to select files and options to run the model.
@@ -68,13 +68,13 @@ class App:
             """ Command the White Star Model.py script to run using the input 
             files selected by the user.
             """
-            
             # Retrieve filename from user input.
             P1 = Path1.get()
+            print('THIS IS P1', P1)
             P2 = Path2.get()
             filename1 = P1.rsplit("/",1)[1]
             filename2 = P2.rsplit("/",1)[1]
-                   
+            
             # Create variable to communicate with 'White_Star_Model.py' whether
             # the user wishes to plot the input data.
             plot_inputs = show_input.get()
@@ -82,7 +82,7 @@ class App:
             # Call and run the white_star_model.py script if the user has
             # selected two files and pressed the run button.
             if (filename1 != '') & (filename2 != ''):
-                white_star_model.running_model(filename1, filename2, 
+                white_star_model.running_model(P1, P2, filename1, filename2, 
                                                plot_inputs)
                                                
         # Create a button to run the program.
@@ -106,7 +106,7 @@ class App:
         in the entry window once selected.
         """
         tmp = askopenfilename(
-                initialdir='/home/', title="filetext", 
+                initialdir='/home/', title="Browse to and select input files", 
                 filetypes=[('text files', '.txt'), 
                            ('comma seperated value files', '.csv')])
         box.delete(0, tk.END) # Clear entry box when browse button is pushed.

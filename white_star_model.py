@@ -10,6 +10,7 @@ import matplotlib.pyplot
 import matplotlib.colors
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 import matplotlib.patches
+import os
 
 tuggable_mass = 36000000
 fraction_ice_asl = 0.1 # Fraction of ice column above surface.
@@ -20,13 +21,13 @@ lidar_unit_height = 0.1    # One unit in the lidar data represents 0.1m height.
 radar_texture_filter = 100  # Values >= to this are interpreted as ice.
 
 
-def plot_input(radar, lidar, cols_radar):
+def plot_input(radar, lidar, cols_radar, filename1, filename2):
     """This function will produce an output map showing the positions of 
     icebergs with an assigned identifcation number, and their attributes 
     (mass and volume).
     """
     # Generate two subplots to display input radar and lidar data.
-    fig, (ax1, ax2) = matplotlib.pyplot.subplots(1, 2, figsize=(15, 15))
+    fig, (ax1, ax2) = matplotlib.pyplot.subplots(1, 2, figsize=(15, 10))
     fig.suptitle('Input Radar and Lidar Data')
     
     # Create plot of input radar data.
@@ -58,19 +59,31 @@ def plot_input(radar, lidar, cols_radar):
     cax = divider.append_axes('bottom', size='5%', pad=0.1)
     cbar2 = fig.colorbar(c2, orientation="horizontal", cax = cax)
     cbar2.set_label('Value (0-255)', rotation=0, labelpad=10)
+    
+    # Check if the 'Model_Outputs folder exists to save the out put map inside.
+    # Create it if it does not exist.
+    current_directory = os.getcwd()
+    final_directory = os.path.join(current_directory, r'Model_outputs')
+    if not os.path.exists(final_directory):
+        os.makedirs(final_directory)
+    # Save figure as an image, creating a name from the input files used.
+    save_1 = filename1.rsplit(".",1)[0]
+    save_2 = filename2.rsplit(".",1)[0]
+    fig.savefig('Model_Outputs/' + str(save_1) + '_&_' + str(save_2) + 
+                '_input' + '.png')  
 
 # The running_model function is called when the run button in the GUI is 
 # pressed or the cose at the bottom of the script can be uncommented in order 
 # to run this script directly and call this function.
 #run_program = False
-def running_model(filename1, filename2, plot_inputs):
+def running_model(P1, P2, filename1, filename2, plot_inputs):
     """Process the input radar and lidar data and determine the position and
     attributes of each iceberg within the area of interest.
     """
-   
+    
     # Load the radar data.
     radar = []
-    with open(filename1, newline='') as f:
+    with open(P1, newline='') as f:
         reader = csv.reader(f, quoting=csv.QUOTE_NONNUMERIC)
         for row in reader: 
             rowlist = []
@@ -85,7 +98,7 @@ def running_model(filename1, filename2, plot_inputs):
     
     # Load the lidar data.
     lidar = []
-    with open(filename2, newline='') as f:
+    with open(P2, newline='') as f:
         reader = csv.reader(f, quoting=csv.QUOTE_NONNUMERIC)
         for row in reader: 
             #print(row)
@@ -96,7 +109,7 @@ def running_model(filename1, filename2, plot_inputs):
     
     # Show plots of input radar and lidar data if user has chosen to plot this.
     if plot_inputs == True:
-        plot_input(radar,lidar,cols_radar)    
+        plot_input(radar,lidar,cols_radar, filename1, filename2)    
 
     # Classify the terrain of each square meter area in the grid area as either 
     # ice or sea. From this create grid showing ice reference numbers in the 
@@ -191,7 +204,14 @@ def running_model(filename1, filename2, plot_inputs):
     
     # Print the results of which icebergs can be tugged and which cannot.
     can_tug = []
-    with open ("Iceberg_details.txt", "w") as f:
+    # Check if the 'Model_Outputs folder exists to save the out put map inside.
+    # Create it if it does not exist.
+    current_directory = os.getcwd()
+    final_directory = os.path.join(current_directory, r'Model_outputs')
+    if not os.path.exists(final_directory):
+        os.makedirs(final_directory)
+    
+    with open ("Model_Outputs/Iceberg_details.txt", "w") as f:
         for i in range(num_of_icebergs):
             if iceberg_mass[i] < tuggable_mass:
                 print('Iceberg {0} can be tugged (mass = {1}kg, '\
@@ -234,7 +254,7 @@ def running_model(filename1, filename2, plot_inputs):
         tug_mask.append(tug_mask_row)
     
     # Generate a figure showing iceberg positions in the area of interest.
-    fig2 = matplotlib.pyplot.figure(figsize=(9, 9))
+    fig2 = matplotlib.pyplot.figure(figsize=(16, 13))
     fig2.suptitle('White Star Line Iceberg Model')
     cmap_iceberg = matplotlib.colors.ListedColormap(['blue', 'green', 'red'])
     matplotlib.pyplot.imshow(tug_mask, cmap=cmap_iceberg)
@@ -276,11 +296,26 @@ def running_model(filename1, filename2, plot_inputs):
                                 wrap = True)
                 break
         
+    
+    # Check if the 'Model_Outputs folder exists to save the out put map inside.
+    # Create it if it does not exist.
+    current_directory = os.getcwd()
+    final_directory = os.path.join(current_directory, r'Model_outputs')
+    if not os.path.exists(final_directory):
+        os.makedirs(final_directory)
+    # Save figure as an image, creating a name from the input files used.
+    save_1 = filename1.rsplit(".",1)[0]
+    save_2 = filename2.rsplit(".",1)[0]
+    fig2.savefig('Model_Outputs/' + str(save_1) + '_&_' + str(save_2) +
+                 '_output' + '.png')    
+    
     print('\nModel run complete.')
         
 # Use the code below to run the model directly from this script 
 # (bypassing the GUI).
+current_directory = os.getcwd()
+print(os.getcwd())
 #filename1 = 'white2_radar.csv'
 #filename2 = 'white2_lidar.csv'
-#plot_inputs = False
+#plot_inputs = True
 #running_model(filename1, filename2, plot_inputs)
