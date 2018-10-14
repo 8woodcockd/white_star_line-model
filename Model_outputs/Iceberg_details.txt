@@ -1,5 +1,0 @@
-Iceberg 1 can be tugged (mass = 33044400kg, volume = 36716m^3)
-Iceberg 2 cannot be tugged (mass = 52661700kg, volume = 58513m^3)
-Iceberg 3 cannot be tugged (mass = 129739500kg, volume = 144155m^3)
-Iceberg 4 cannot be tugged (mass = 556576200kg, volume = 618418m^3)
-Iceberg 5 cannot be tugged (mass = 638674200kg, volume = 709638m^3)
