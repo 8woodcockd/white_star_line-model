@@ -63,7 +63,7 @@ def plot_input(radar, lidar, cols_radar, filename1, filename2):
     # Check if the 'Model_Outputs folder exists to save the out put map inside.
     # Create it if it does not exist.
     current_directory = os.getcwd()
-    final_directory = os.path.join(current_directory, r'Model_outputs')
+    final_directory = os.path.join(current_directory, r'Model_Outputs')
     if not os.path.exists(final_directory):
         os.makedirs(final_directory)
     # Save figure as an image, creating a name from the input files used.
@@ -71,7 +71,7 @@ def plot_input(radar, lidar, cols_radar, filename1, filename2):
     save_2 = filename2.rsplit(".",1)[0]
     fig.savefig('Model_Outputs/' + str(save_1) + '_&_' + str(save_2) + 
                 '_input' + '.png')  
-
+    fig.show()
 # The running_model function is called when the run button in the GUI is 
 # pressed or the cose at the bottom of the script can be uncommented in order 
 # to run this script directly and call this function.
@@ -202,15 +202,16 @@ def running_model(P1, P2, filename1, filename2, plot_inputs):
                 berg_volume += ice[j].volume_tot
         iceberg_volume.append(berg_volume)
     
-    # Print the results of which icebergs can be tugged and which cannot.
-    can_tug = []
+    
     # Check if the 'Model_Outputs folder exists to save the out put map inside.
     # Create it if it does not exist.
     current_directory = os.getcwd()
-    final_directory = os.path.join(current_directory, r'Model_outputs')
+    final_directory = os.path.join(current_directory, r'Model_Outputs')
     if not os.path.exists(final_directory):
         os.makedirs(final_directory)
     
+    # Print the results of which icebergs can be tugged and which cannot.
+    can_tug = []
     with open ("Model_Outputs/Iceberg_details.txt", "w") as f:
         for i in range(num_of_icebergs):
             if iceberg_mass[i] < tuggable_mass:
@@ -300,7 +301,7 @@ def running_model(P1, P2, filename1, filename2, plot_inputs):
     # Check if the 'Model_Outputs folder exists to save the out put map inside.
     # Create it if it does not exist.
     current_directory = os.getcwd()
-    final_directory = os.path.join(current_directory, r'Model_outputs')
+    final_directory = os.path.join(current_directory, r'Model_Outputs')
     if not os.path.exists(final_directory):
         os.makedirs(final_directory)
     # Save figure as an image, creating a name from the input files used.
@@ -308,14 +309,5 @@ def running_model(P1, P2, filename1, filename2, plot_inputs):
     save_2 = filename2.rsplit(".",1)[0]
     fig2.savefig('Model_Outputs/' + str(save_1) + '_&_' + str(save_2) +
                  '_output' + '.png')    
-    
+    fig2.show()
     print('\nModel run complete.')
-        
-# Use the code below to run the model directly from this script 
-# (bypassing the GUI).
-current_directory = os.getcwd()
-print(os.getcwd())
-#filename1 = 'white2_radar.csv'
-#filename2 = 'white2_lidar.csv'
-#plot_inputs = True
-#running_model(filename1, filename2, plot_inputs)

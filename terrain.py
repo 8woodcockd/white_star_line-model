@@ -6,7 +6,7 @@ Created on Sat Sep 22 20:23:01 2018
 """
 
 class Ice:
-    """Assign attributes to each identified ice cell (assumed sea).
+    """Assign attributes to each identified ice cell.
     """ 
     
     def __init__(self, i, j, radar, lidar, lidar_unit_height, pixel_area, 

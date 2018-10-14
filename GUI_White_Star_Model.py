@@ -2,7 +2,6 @@ import tkinter as tk
 import white_star_model
 from tkinter.filedialog import askopenfilename
 from tkinter.font import Font
-import os
 
 class App:
     """ Create a GUI for the user to select files and options to run the model.
@@ -70,7 +69,6 @@ class App:
             """
             # Retrieve filename from user input.
             P1 = Path1.get()
-            print('THIS IS P1', P1)
             P2 = Path2.get()
             filename1 = P1.rsplit("/",1)[1]
             filename2 = P2.rsplit("/",1)[1]
